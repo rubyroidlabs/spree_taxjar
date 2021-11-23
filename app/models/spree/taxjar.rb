@@ -24,6 +24,10 @@ module Spree
       if has_nexus?
         api_params = transaction_parameters
         SpreeTaxjar::Logger.log(__method__, {order: {id: @order.id, number: @order.number}, api_params: api_params}) if SpreeTaxjar::Logger.logger_enabled?
+        taxjar_order = @client.show_order(@order.number)
+        return taxjar_order if taxjar_order.present?
+
+        SpreeTaxjar::Logger.log(__method__, {order: {id: @order.id, number: @order.number}, api_response: api_response}) if SpreeTaxjar::Logger.logger_enabled?
         api_response = @client.create_order(api_params)
         SpreeTaxjar::Logger.log(__method__, {order: {id: @order.id, number: @order.number}, api_response: api_response}) if SpreeTaxjar::Logger.logger_enabled?
         api_response
